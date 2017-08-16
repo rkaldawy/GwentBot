@@ -1,0 +1,1 @@
+This is a readme file. It will be filled in a later commit. Thus far, bot.py holds all the code for connecting to the Twtich IRC server and playing the Gwent game.
