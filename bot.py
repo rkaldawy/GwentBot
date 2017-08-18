@@ -7,10 +7,14 @@ import screen
 import threading
 import random
 import os
-#import win32com.client
+
 
 #THINGS TO DO:
 #Make the input dict based on the incoming whitelist
+#Reform the token detector
+#make screen listeners
+
+s = cfg.SOCKET
 
 input_dict = dict(w=0, a=0, s=0, d=0, enter=0, escape=0, one=0, two=0, three=0, \
                   four=0, five=0, six=0, seven=0, eight=0, nine=0, ten=0, eleven=0, \
@@ -229,6 +233,8 @@ def pollChat(msg, whitelist, makeMove):
     
     return vote
 
+
+'''
 def checkForMulligan() :
     img = screen.grabButton(screen.MULL_BTTN_COORDS)
     if (screen.testSimilar(img, "mull_btn.png")) :
@@ -276,13 +282,17 @@ def playBotMatch():
         vote = pollChat(msg, key_whitelist, True)
         print(vote)
         #add check for enters 
-        if (vote == "escape") :
+        if vote == "escape" :
             #perform an enter and exit to the round screen
             controlGame("enter")
             isMulligan = False
+        elif vote == "enter" :
+            time.sleep(2)
+            check = checkToken()
+            if check == 1 :
+                isMulligan = False
     
-    while hasNotPassed :    
-        
+    while hasNotPassed :        
         while True :
             check = checkToken()
             if check == 1 :
@@ -330,92 +340,14 @@ def playBotMatch():
             time.sleep(3)
             
     print("Finished!")    
-        
-        #while isMyTurn :
-            #special code counting goes here
-            
-    #wait for mulligan screen
-    #after three selects or escape, wait until token is a color
-    #if the token is ever red, dp nothing until you see blue (unless you have passed)
-    #if the token is blue, if you have not already passed, try to select a card from hand, ...
-        #do not end turn until a red is seen.
-    #if a mulligan screen shows up, reset pass metrics and mulligan again
+
 
 
 #set up a child thread to run operations for us
-threads = []
 
-t = threading.Thread(target=fileCommand)
-threads.append(t)
-t.start()
-
-#establish a connection to twitch  
-s = socket.socket()
-s.connect((cfg.HOST, cfg.PORT))
-s.send("PASS {}\r\n".format(cfg.PASS).encode("utf-8"))
-s.send("NICK {}\r\n".format(cfg.NICK).encode("utf-8"))
-s.send("JOIN {}\r\n".format(cfg.CHAN).encode("utf-8"))
-
-s.setblocking(False)
-
-#move to setup function
-os.chdir("C:\\Users\\Remy Kaldawy\\Pictures\\gwent_sources")
-
-#introduce yourself
-chat(s, "I am a friendly bot! Don't mind me!")
-
-#twitch chat polling code
-
-playBotMatch()
 
 #CODE FOR GENERIC CONTROL
 '''
-while True:
-    
-    t0 = time.time()
-    t1 = t0
-    vote_state = 0
-    
-    chat(s, "Voting for the next turn has begun!")
-    while (t1 - t0) < 5 :
-        
-        try:
-            response = s.recv(1024).decode("utf-8")
-        except socket.error:
-            response = ""
-    
-        if response == "PING :tmi.twitch.tv\r\n":
-            s.send("PONG :tmi.twitch.tv\r\n".encode("utf-8"))
-        else:      
-            parseInput(response)
-        t1 = time.time()          
-        #time.sleep(0.5)
-        
-    chat(s, "Voting has ended.")
-    #this needs to become a semaphore that is locked until the consumer stops     
-    while len(msg_buffer) > 0 :
-        pass
-    print(input_dict)
-    time.sleep(0.5)
-    
-    vote = chooseMax()
-    chat(s, matchVoteToAction(vote) + " won the vote!")
-    print("Winner of vote: " + matchVoteToAction(vote))
-    #handle the vote here
-    
-    #this uses ctypes.windll to simulate keyboard presses as 
-    #windows objects
-    controlGame(vote)
-     
-    resetDict()
-    time.sleep(1)
-    try:
-        s.recv(1024).decode("utf-8")
-    except socket.error:
-        pass
-
-'''
-
 
 
 

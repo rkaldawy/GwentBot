@@ -69,18 +69,4 @@ def numberAnalysis(img):
     saveImage(new_img)
     
     
-def main():
-    os.chdir("C:\\Users\\Remy Kaldawy\\Pictures\\gwent_sources")
-    #img = grabButton(EXIT_BTTN_COORDS) 
-    
-    img = grabToken()
-    print(checkTokenColor(img))
-    
-    #print(testMainMenu(img))
-    
-    #numberAnalysis(img)
-    #checkTokenColor(img)
- 
-if __name__ == '__main__':
-    main()
 
