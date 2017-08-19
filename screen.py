@@ -4,6 +4,8 @@ from PIL import ImageChops
 import os
 import time
 import numpy as np
+import threading
+from abc import ABCMeta, abstractmethod
 
 TOKEN_COORDS = (130, 470, 280, 610) 
 HAND_COUNT_COORDS = (430, 1010, 480, 1050)
@@ -14,6 +16,78 @@ EXIT_BTTN_COORDS = (975, 1000, 1065, 1043)
 BLUE_RGB = (0, 0, 255)
 RED_RGB = (255, 0, 0)
 GRAY = [90, 101, 107]
+
+
+## abstract listener class
+class ScreenListener(object):
+    """ A listener which acquires an area of a screen and tests what is there
+    
+    Attributes:
+        box: The rectangular coordinates of the part of the screen to be sampled.
+        thread: the threading object associated with the listener
+        semaphore: the semaphore associated with the listener (controlled when the listener finds what it is looking for)
+        path: The name of the reference picture the scanner will compare to (null if not applicable)
+        
+    """
+    
+    __metaclass__ = ABCMeta
+    
+    def __init__(self, box, path):
+        self.box = box
+        self.path = path
+        self.thread = threading.Thread(target=self.scanForItem)
+        self.semaphore = threading.Semaphore()
+        self.foundTarget = 0
+    
+    
+    def grabImage(self):
+        return grabArea(self.box)
+    
+    def freezeListener(self):
+        self.semaphore.acquire()
+        
+    def playListener(self):
+        self.semaphore.release()
+    
+    @abstractmethod    
+    def scanForItem(self):
+        pass    
+
+
+##button Listener
+class TokenListener(ScreenListener):
+    
+    def scanForItem(self):
+        while True:
+            self.semaphore.acquire()
+            img = self.grabImage()
+            arr = np.array(img)
+            avg = np.average(arr, axis=(0, 1)) * [2, 1, 2]
+        
+            if (avg[0] < 100 and avg[2] > 100) :
+                self.foundTarget = 1
+            elif (avg[0] > 100 and avg[2] < 100) :
+                self.foundTarget = 0
+            else :
+                self.foundTarget = -1
+            self.semaphore.release()
+            time.sleep(0.5)
+    
+class ButtonListener(ScreenListener):
+    
+    def scanForItem(self):
+        while True:
+            self.semaphore.acquire()
+            img = self.grabImage()
+            target = Image.open(self.path)
+            arr = np.array(ImageChops.difference(img, target))
+            if np.amax(arr) <= 10 :
+                self.foundTarget = 1
+            else :
+                self.foundTarget = 0
+            self.semaphore.release()
+            time.sleep(0.5)
+
 
 
 def saveImage(img):
@@ -33,6 +107,12 @@ def grabHandCards():
     return im
 
 def grabButton(coords):
+    box = coords
+    im = ImageGrab.grab(box)
+    
+    return im
+
+def grabArea(coords):
     box = coords
     im = ImageGrab.grab(box)
     
