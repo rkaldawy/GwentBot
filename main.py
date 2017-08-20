@@ -4,11 +4,13 @@ import threading
 import os
 import gwent
 
-threads = []
+threads = cfg.THREADS
 
 t = threading.Thread(target=bot.fileCommand)
 threads.append(t)
 t.start()
+
+
 
 #establish a connection to twitch  
 s = cfg.SOCKET

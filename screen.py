@@ -5,6 +5,7 @@ import os
 import time
 import numpy as np
 import threading
+import cfg
 from abc import ABCMeta, abstractmethod
 
 TOKEN_COORDS = (130, 470, 280, 610) 
@@ -48,6 +49,9 @@ class ScreenListener(object):
         
     def playListener(self):
         self.semaphore.release()
+        
+    def startThread(self):
+        self.thread.start()
     
     @abstractmethod    
     def scanForItem(self):
@@ -60,6 +64,7 @@ class TokenListener(ScreenListener):
     def scanForItem(self):
         while True:
             self.semaphore.acquire()
+            print("TokenListener")
             img = self.grabImage()
             arr = np.array(img)
             avg = np.average(arr, axis=(0, 1)) * [2, 1, 2]
@@ -78,6 +83,7 @@ class ButtonListener(ScreenListener):
     def scanForItem(self):
         while True:
             self.semaphore.acquire()
+            print("ButtonListener")
             img = self.grabImage()
             target = Image.open(self.path)
             arr = np.array(ImageChops.difference(img, target))
@@ -88,7 +94,19 @@ class ButtonListener(ScreenListener):
             self.semaphore.release()
             time.sleep(0.5)
 
-
+def initListeners():
+    threads = cfg.THREADS
+    
+    MulliganButtonListener = ButtonListener(MULL_BTTN_COORDS, "mull_btn.png")
+    threads.append(MulliganButtonListener.thread)
+    #MulliganButtonListener.freezeListener()
+    MulliganButtonListener.startThread()
+    
+    TurnTokenListener = TokenListener(TOKEN_COORDS, "")
+    threads.append(TurnTokenListener.thread)
+    #TokenListener.freezeListener()
+    TurnTokenListener.startThread()
+    
 
 def saveImage(img):
     #os.chdir("C:\\Users\\Remy Kaldawy\\Pictures\\")
@@ -148,5 +166,7 @@ def numberAnalysis(img):
     new_img = Image.fromarray(arr, "RGB")
     saveImage(new_img)
     
-    
-
+#TESTING THE OBJECTS
+#make sure to remove when done testing
+os.chdir("C:\\Users\\Remy Kaldawy\\Pictures\\gwent_sources")
+initListeners()

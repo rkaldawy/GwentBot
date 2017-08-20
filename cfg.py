@@ -9,3 +9,5 @@ RATE = (20/30)
 BUFF = 10
 
 SOCKET = socket.socket()
+
+THREADS = []
