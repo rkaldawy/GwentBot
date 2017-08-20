@@ -1,5 +1,6 @@
 import screen
 import time
+import cfg
 from bot import *
 
 def checkForMulligan() :
@@ -27,16 +28,30 @@ def checkToken() :
 
 def playBotMatch():
     
+    listeners = cfg.LISTENERS
+    
     isMulligan = False
     isMyTurn = False
     selectedFromHand = False
     hasNotPassed = True    
     
-        #wait until we know we are mulliganing
+    '''    #wait until we know we are mulliganing
     while True:
         isMulligan = checkForMulligan()
         if isMulligan :
             break
+    '''
+    
+    MulliganButtonListener = listeners["MulliganButtonListener"]    
+    MulliganButtonListener.playListener()
+    
+    while MulliganButtonListener.foundTarget == 0 :
+        pass
+    
+    MulliganButtonListener.freezeListener()
+    MulliganButtonListener.foundTarget = 0
+    
+    print("We found the button!")
         
     while isMulligan :
         msg = "Time to mulligan. Choose either left or right, enter to select, or escape to leave the mulligan."

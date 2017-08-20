@@ -11,3 +11,5 @@ BUFF = 10
 SOCKET = socket.socket()
 
 THREADS = []
+
+LISTENERS = {}

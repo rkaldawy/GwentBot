@@ -64,7 +64,6 @@ class TokenListener(ScreenListener):
     def scanForItem(self):
         while True:
             self.semaphore.acquire()
-            print("TokenListener")
             img = self.grabImage()
             arr = np.array(img)
             avg = np.average(arr, axis=(0, 1)) * [2, 1, 2]
@@ -83,7 +82,6 @@ class ButtonListener(ScreenListener):
     def scanForItem(self):
         while True:
             self.semaphore.acquire()
-            print("ButtonListener")
             img = self.grabImage()
             target = Image.open(self.path)
             arr = np.array(ImageChops.difference(img, target))
@@ -96,15 +94,20 @@ class ButtonListener(ScreenListener):
 
 def initListeners():
     threads = cfg.THREADS
+    listeners = cfg.LISTENERS
     
     MulliganButtonListener = ButtonListener(MULL_BTTN_COORDS, "mull_btn.png")
     threads.append(MulliganButtonListener.thread)
-    #MulliganButtonListener.freezeListener()
+    #comment the following line to have the listener start on
+    listeners["MulliganButtonListener"] = MulliganButtonListener
+    MulliganButtonListener.freezeListener()
     MulliganButtonListener.startThread()
     
     TurnTokenListener = TokenListener(TOKEN_COORDS, "")
     threads.append(TurnTokenListener.thread)
-    #TokenListener.freezeListener()
+    #comment the following line to have the listener start on
+    listeners["TurnTokenListener"] = TurnTokenListener
+    TurnTokenListener.freezeListener()
     TurnTokenListener.startThread()
     
 
@@ -168,5 +171,5 @@ def numberAnalysis(img):
     
 #TESTING THE OBJECTS
 #make sure to remove when done testing
-os.chdir("C:\\Users\\Remy Kaldawy\\Pictures\\gwent_sources")
-initListeners()
+#os.chdir("C:\\Users\\Remy Kaldawy\\Pictures\\gwent_sources")
+#initListeners()

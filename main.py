@@ -1,6 +1,7 @@
 import cfg
 import bot
 import threading
+import screen
 import os
 import gwent
 
@@ -10,7 +11,7 @@ t = threading.Thread(target=bot.fileCommand)
 threads.append(t)
 t.start()
 
-
+screen.initListeners()
 
 #establish a connection to twitch  
 s = cfg.SOCKET
